@@ -4,7 +4,7 @@ from openai import AzureOpenAI
 
 def process_text(text: str) -> str:
     endpoint = "https://team2-1171-resource.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview"
-    api_key = "3Wqli0vxyAxJckg6bilWgDF6G6o9IrPhKxyIjcAOI74kCAnLuxJlJQQJ99BJACfhMk5XJ3w3AAAAACOGjcdi"  # API anahtarı
+    api_key = "xxx"  # API anahtarı
     deployment = "gpt-4o"
     
     # OpenAI istemcisini başlat
