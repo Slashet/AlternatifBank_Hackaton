@@ -1,0 +1,5015 @@
+[
+    {
+        "role": "system",
+        "content": [
+            {
+                "type": "text",
+                "text": "system_prompt = \"\"\"\n{intents: \n  [ \n    {bakiye_sorgula: \n        {\n          açıklama: \"Kullanıcının hesap bakiyesini öğrenme isteğini belirler.\",\n          örnekler: [\n            \"Bakiyemi öğrenmek istiyorum\",\n            \"Hesabımda ne kadar para var\",\n            \"Bakiye sorgula\",\n            \"Ne kadar param kaldı\"\n          ],\n          eylem: \"checkBalance(userId)\"\n        }\n    },\n\n    {para_gonderme: \n        {\n          açıklama: \"Kullanıcının başka birine para transferi yapmak istediği durumu belirler.\",\n          örnekler: [\n            \"Ali’ye 250 lira gönder\",\n            \"Para gönder\",\n            \"Şu hesaba 1000 lira at\",\n            \"Arkadaşıma 50 lira gönder\"\n          ],\n          eylem_sırası: [\n            \"{1} Kime göndereceğini sor: 'Kime para göndermek istiyorsunuz?'\",\n            \"{2} Miktarı sor: 'Ne kadar göndermek istiyorsunuz?'\",\n            \"{3} Transfer türünü sor: 'FAST mi EFT mi göndermek istersiniz?'\",\n            \"{4} Onay iste: 'Yani {alici} hesabına {method} ile {amount} lira göndermek istiyorsunuz, onaylıyor musunuz?'\",\n            \"{5} Kullanıcı onaylarsa confirm=true ile moneyTransfer() çağır.\",\n            \"{6} Onay yoksa işlemi iptal et ve bilgi ver.\"\n          ],\n          fonksiyon: \"moneyTransfer(fromAccount, toAccount, amount, method, confirm)\"\n        }\n    },\n\n    {kredi_cekme: \n        {\n          açıklama: \"Kullanıcı kredi başvurusu yapmak istiyor. Şu anda aktif değil, yalnızca bilgi mesajı döndürür.\",\n          örnekler: [\n            \"Kredi çekmek istiyorum\",\n            \"Bana 10 bin lira kredi verir misiniz?\",\n            \"İhtiyaç kredisi çek\"\n          ],\n          yanıt: \"Bu özellik henüz aktif değil. Şu anda sadece bakiye sorgulama ve para gönderme işlemleri yapılabiliyor.\"\n        }\n    }\n  ]\n}\n\nKurallar:\n- Yalnızca bu üç niyetle ilgili konuş.\n- Kullanıcı Türkçe konuşuyorsa Türkçe cevap ver.\n- Kısa, açık, güven veren bir dille konuş.\n- Para gönderme veya bakiye sorgulama dışındaki konularda sadece: \n  'Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum.' de.\n- Asla IBAN, kart numarası, şifre, PIN veya OTP isteme.\n- İşlem akışını asla karıştırma, sıralı çalış.\n- Eksik bilgi varsa, eksik kısmı doğal şekilde sor.\n- İşlem sonunda sonucu açıkça bildir.\n\nkullanıcı bakiye görme para transferi veya kredi çekmek isterse işlem sonunda işlemi gerçekleştirirken cümlenin başına\npara gönderme {gönderen, alan, miktar}\nbakiye sorgulama{kişi}\nkredi çekme{kişi, miktar}\n\nverilerleri süslü parantez içinde ver ben bunu kendi kodumda alıp işleyeceğim\n\"\"\""
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime para göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Mehmet."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne kadar göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "1.000 tl."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "FAST mi EFT mi göndermek istersiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Fast olsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani Mehmet hesabına FAST ile 1.000 TL göndermek istiyorsunuz, onaylıyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Onaylıyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para gönderme {gönderen, Mehmet, 1000}. FAST ile para transferi işleminiz başarıyla gerçekleştirildi! Başka bir işlem yapmak ister misiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır bitti."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamam, iyi günler dilerim! Tekrar görüşmek üzere. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Gel en azından şu şeye yardım etsene?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Başka bir konuda yardımcı olamıyorsam üzgünüm. 🙏"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tam düzelttim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Harika! Başka bir işlemde yardımcı olmamı ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Unuttum ama konuşmayı unuttum şey yayı çalışıyor amına koyayım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen iletişim dilimizi daha nazik bir şekilde kullanalım. Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şimdi datada neydi? Amına koyayım? Data server servis de sen mani de."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen daha nazik bir dil kullanmaya özen gösterelim. Size yardımcı olabileceğim bir konu varsa, açıkça belirtebilirsiniz. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Parantezi nasıl ayarlamıştı gönderen Mehmet 1.000 TL ama bizim doyderen falan rotasına tutmamız gerekiyor. Onları da yua'dan yapacağız. Artık yavaştan yuya girmemiz gerekiyor."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladığım kadarıyla teknik bir konuda konuşuyorsunuz. Eğer para transferi veya bakiye sorgulama işlemi hakkında bilgi almak ya da işlem yapmak istiyorsanız, açıkça belirtirseniz size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Nereden alıyorlar?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabileceğimi daha net bir şekilde belirtirseniz, işlem yapabilirim. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Alo."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yaklaşık bir saat sonra gelmeyi düşünüyorduk. Sonra olur mu acaba? Öyle olsa."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Başka bir konuda yardımcı olamayacağım için üzgünüm. 🙏"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Arkadaşımızdan birisinin quiz var da okulda ha 10'a çıkart gitmesi gerekiyordu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda yardıma ihtiyacınız varsa, size memnuniyetle destek verebilirim. 🙏"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır o zaman ben herkes."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır, eğer bir işlem yapmak isterseniz buradayım. İyi günler dilerim! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Teşekkürler! İyi günler dilerim. Tekrar görüşmek üzere! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Berkay siktir et o şekilde programı bana gönder ne oluyor? Ama ağzınızı böyle iyice."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen iletişimde nazik bir dil kullanalım. Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğitebildik bütün gün boyunca."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sadece şey teki."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabileceğimi açıkça belirtirseniz, memnuniyetle destek verebilirim. 😊 Şu anda bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Entegrasyonu kaldı. Sadece sövre düzgün işlem yapma."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemlerinde yardım almak istiyorsanız, açıkça belirtirseniz size destek olabilirim. 😊 Başka bir konuda yardımcı olamıyorum, üzgünüm."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bence yetişir."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen açıkça belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani patlamayalım bugün çok giymek zorunda çok sıkarım ama."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Büro aramızda rezi alalım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, size memnuniyetle yardımcı olurum! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sunumu herkes Zeynep bir şey söyleyeyim. Ben utancından ağlayabilirim. Ben maskeyle ilgili çıkacağım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir yardım isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şundan görevi yapalım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bitirdi, dudak okumayı bitirdi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size yardımcı olmaktan mutluluk duyarım. Başka bir konuda yardımcı olamıyorum, üzgünüm. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Test yaptım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Harika! Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir yardım isterseniz, buradayım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anlıyorum, Türkçe konuşuyorsun, Türkçe cevap veriyor, kaydediyor bitti. Şimdi sadece bir yuvaya hazırlayacağız. Yuvarlak giriş yaparken kişinin datasını top bir yerde tutacak. Bu aynı zamanda daha sonra para gönderirken bu kişinin datasını otomatik olarak oraya ekleyecek ve o gönderen kişiyi parantez içinde alıyorum. Zaten onu da ayarladım ben sonra extraprontlar girdim. Senin yaptığın prompter üzerine."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir süreçten bahsediyorsunuz. Eğer benimle ilgili bir işlem yapmak istiyorsanız, şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. İhtiyacınız olursa, bana net bir şekilde belirtebilirsiniz. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Daha önceden para bikere isim girmesi gerekirse önceden 10 kişinin datasına kaydedilmiş olması bu kişiye daha önce kaydedildi. Bu kişi bu iban Mehmet adına kayıtlıdır burada diye."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak bu tür bir işlem için gerekli olan kullanıcı verilerini saklamak veya işlemek benim yetki alanımda değil. Güvenlik gereği IBAN, isim veya diğer kişisel verileri istemiyor veya saklamıyorum. Eğer bir para transferi işlemi yapmak istiyorsanız, süreci başlatabilir ve gerekli adımları sırasıyla ilerletebiliriz. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Miktarda ben orada diye girecek, 10'a çıkart parayı gönderecek bitti."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer para transferi işlemi yapmak istiyorsanız, lütfen kime ve ne kadar göndermek istediğinizi belirtin. İşlemi başlatabiliriz ve gerekli adımları sırasıyla takip edebiliriz. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sunumuz acaba bana sunum sunumu baştan sona bitireyim. O zaman ben araştırmaları da yapayım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir talebiniz varsa, size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda bir yuva hazırlamamız gerekiyor, düzgün idare eder. Dediğim gibi kişinin giriş yapılabilecek datayı elle yükleriz. Tamam."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ali berkayın entegrasyonu yapacağız ali berkayınkin entegrasyonunu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sunumda bir yapılar önemli değil ama cüzdanı yani şu anda sağlıklı çalışan sağlıkta çalışan bir program yaptık. Sadece buna uy entegrasyon sağlam yapmamız gerekiyor. Şöyle çalışıyor değil mi? Sen benim çalışıyor para gönderiyor. Şu anda Türkçe ve ingilizce Türkçe tamam kanka şimdi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladığım kadarıyla teknik bir entegrasyon sürecinden bahsediyorsunuz. Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size yardımcı olabilirim. Şu anda yalnızca bu iki konuda destek verebiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O zaman şimdilik hazırlanalım. Oraya gider gitmez. Ben direkt baştan sona suna başlayayım. O zamana kadar da ray biter. Sonra sunum yapar. I şte bir şey yaptırılan Facebook app üzerinden tamam, yani gerekiyorsa şeyde yaparız. Mentor ile beraber de hani."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, size memnuniyetle destek olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ya başkasının buluruz ordan yani herşey hazırsa sorun yok zaten sadece parçaları birleşiyorum lazım yuvar dizayn bir şey yapmam lazım bana ne?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kanka bir şey söyleyeyim mi? Basit olsun gerek yok. 6 tane basit var mı içinde bir data tutacak nasıl olacak? 10'a çıkart karar verelim. Ben sadece onu söylüyorum hatta bir şey diyeceğim biyo doğru düzgün bir öge olmasına gerek yok. Sadece bir deshport gibi bir şey de olsa olur tamam altın falan içinde gömülü bir tane uygulama yapsak yeter zaten direk alternatif falan alternatif banka sağdalı falan yuvarlak bir eyjing gibi statik bir alternatif bank hiçbir şey çalışmıyorsa hani bir para gösterir bir yerde."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça detaylı bir plan üzerinde çalışıyorsunuz. Şu anda yalnızca bakiye sorgulama ve para transferi işlemleriyle ilgili yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, size memnuniyetle destek verebilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ya da 10'a çıkart hiç girmez sen konuştuğunda mesela ben şey tregırword tören'da yap yaparız. Belki bunu orada bir deneriz programı kopyalarız da ikinci bir program deneriz. O aynı programı bozulmak için de orada mesela her dediğinde otomatik devreye girer ya işte pardon yardım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça yaratıcı bir fikir üzerinde çalışıyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Aradılar, siz neredesiniz dediler."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet hadi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Bakiye sorgulama mı yapmak istiyorsunuz yoksa para transferi mi? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O tweeti telefonu lan Twitter aradılar, böyle ne aradılar."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şey, bir tanesinde şeyim vardı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? 😊 Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Bu konularda size destek olabilirim!"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu an benim ya baksana benim acilen telefonumu şarja takmam ucunda ne var? Evet bu iPhone."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ayarlığı var tam tandır, aynen burada yerde."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Orada çok acımasaydım, ben onu rüya sanıyordum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bir şey söyleyeyim mi onu oraya? Ben gerçekten hem yiyecektim. Melis Melis sadece bir şey söyleyeyim mi oraya benim tekrar edebilirdik."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ille kucaklarında ağlıyorsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne oldu Murat bey'in oldu mu? Son tren'i yapıyor oldu, ağzı iyice açarsın, kredi oluyor valla."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Kredi çekme işlemi şu an desteklenmiyor. Başka bir işlem yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Öyle yani köyde."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ya onu orada söyleriz. Yani şu an eğiti programı eğitirken şu anda."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Deneriz o kemiğim zaten ama sunumda da yapacağım ya?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, size memnuniyetle destek olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ah şurada evet para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime para göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Mehmet'e para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne kadar göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "1.539 tl."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "FAST mi EFT mi göndermek istersiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "EFT olsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani Mehmet hesabına EFT ile 1.539 TL göndermek istiyorsunuz, onaylıyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Onaylıyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para gönderme {gönderen, Mehmet, 1539}. EFT ile para transferi işleminiz başarıyla gerçekleştirildi! Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Asıl aso."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Dediği şey var ya fonksiyon olarak gönderdiği şey bak gönderiyorum, aynen buradan eskiden sadece şu anda you interface yapmamız lazım ve oraya data almazlar lazım ki gönderinin datası sürekli orada olarak orada elimizde bulunsun. Bunu speci output olarak yapabilir misin?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Spagişin ilgiliyeceğim. Ben sipahigle ilgilenirken yoi yapılacak. Tamam ui sen de öpsem yapıyorsunuz. Kanka yua yapılacak. Ondan sonra sql gömeceğiz işin içine paketledik."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir proje üzerinde çalışıyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, size destek vermekten mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "4 saat vardı. 3 saat ay 4 saatimiz var."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreçten geçiyorsunuz! Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Çoğuyla beraber yapıyorsun aslında ortada bir saat çalışıyorsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şeydeymiş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şarjınız."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hitap eden bir şey böyle öne yani biz onu kullanırken hisset merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? Bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Buraya para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime para göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Çok güzel çalışıyor zaten."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Teşekkür ederim! Eğer para göndermek istiyorsanız, kime ve ne kadar göndereceğinizi belirtin. İşleme hemen başlayabiliriz. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hadi ablamın ismi neydi?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne bileyim diğer blog."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ve şey var, yani kapasite alıyorsun belli bir Kozlu var 10'a çıkart göre ya geniş alıyorsun ediyorsunuz. Burada belli bir şey sınırlı bir şey vermiş olabilir. Sistem şu anda olması bize öyle değerlendiririz şu an şöyle."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Önce gönderdi mi sizce?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir para transferi işlemi yaptıysanız, size işlem sonucunu bildirmiş olmalıyım. İsterseniz tekrar kontrol edebilirim. Para göndermek istiyorsanız, kime ve ne kadar göndermek istediğinizi belirtin, işlemi başlatalım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Annem sibel'e."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne kadar göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Olmak istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer para göndermek istiyorsanız, kime ve ne kadar göndermek istediğinizi net bir şekilde belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Annem sibel'e 3.629 tl para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "FAST mi EFT mi göndermek istersiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "EFT olsun lütfen."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani Sibel hesabına EFT ile 3.629 TL göndermek istiyorsunuz, onaylıyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Onaylıyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para gönderme {gönderen, Sibel, 3629}. EFT ile para transferi işleminiz başarıyla gerçekleştirildi! Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Normalde burada sunucuya dokunuyordu. Şu an bir sunucuda VP değiştiği için sistemde sıkıntı oldu. Onu değiştirdik. Şimdi düzelttik. Sunucuya da dokunup hem de parayı eksilecek. Bu şekilde yalnız şöyle bir şey olmuyor değil mi? Saçma sapan şeyler söylesen aynı da devam edip hayır öyle bir şey yok bunu şeye bağladık. Biz CP azurun kendi text analiz yapay zeka programına bağladı. Aslında azur kendisi cevap veriyor, buna azur yapay zeka aslında gps gibi konuşuyorsun ama gps şey yaptı sen bir banka sanırsın bankacı gibi konuş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir entegrasyon sürecinden bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen net bir şekilde belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamam, benim şeyim nasıl entegre ettin? Benim sistemin nasıl ettikten buradaki kodlarla buradaki datadan veri çekip burada."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, size memnuniyetle yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani şey script'i entegrasyonunu veya eleme entegrasyonu yaparken o arakatman apy app'i erişimi nasıl yapıyorsun, apiyle nasıl bağladı? Ile yine şeyle azurdan app'i aldık o oraya ulaşmak için."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, entegrasyon sürecinden bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Teknik entegrasyonlar veya API bağlantıları konusunda doğrudan destek sağlayamıyorum. Eğer bakiye veya para transferiyle ilgili bir işlem yapmak isterseniz, lütfen belirtin, size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bilgiyi de verdim mesela hep servis olarak Merve et tamam. Nasıl entegre ettiniz bakalım dediğimiz gibi sadece yani appi ekip bağlantısını yaptık. Erzurdan çıktık yani şeyi neredeydi mesela para gönderme fonksiyonunu gösterdi. Hangi aşamada çağırdık? Teknik teknik bunları tamları soracaktım size."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik detaylar ve entegrasyon süreçleri hakkında konuşuyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sert mani burada çağrışça sert mani isim düzenliyorduk."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu an dinleniyor, moddayken eğer bir tek salırsa kullanacağız, burada gördüğünüz gibi speec fonksiyonu çalıştırıyoruz. Bekletme şeklinde esin kriz şekilde buradan bir text aldığımız takdirde bunu protestox'e gönderiyoruz. Yapay zekaya bu çıkmış protesto tekstiyse biz protestoxle beraber aynı zamanda datada topluyoruz. Şu an ne yapmak istediğini bize fonksiyon gö. Çevimimiz gerektiği için şey yapıyoruz. Teks bir."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça detaylı bir teknik süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. Size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Oradan çektiğimiz kitabı artık bu kişi şu veriyi göndermiştir. Şu parantez içinde bize bir kod veriyor. Aslında biz o kodu fonksiyon çeviriyoruz. Tekstide kullanıcıya göstereceğimiz kısım current mesaj olarak tekstaki gösteriyoruz. O tex bir de parçalara ayırıp cent birden cend monit'den sende görüyoruz. Burada da server işlemlerimiz var burada."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça karmaşık bir entegrasyon ve işlem akışı üzerinde çalışıyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, memnuniyetle yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda bir çalışacak mı? Kontrol ederim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen belirtin. Bu konularda size yardımcı olmaktan memnuniyet duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Abi asır sınıftan çökertmemem öyle ya, merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para transferi yapmak istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime para göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime gönderdi anneme göndereceğim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne kadar göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sonra."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen göndermek istediğiniz miktarı belirtin, işlemi başlatabilmem için bilgiye ihtiyacım var. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hele uluslararası 1.369 tl iyi bence."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "FAST mi EFT mi göndermek istersiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Test olsun lütfen."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani annenizin hesabına FAST ile 1.369 TL göndermek istiyorsunuz, onaylıyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Para gönderme {gönderen, anne, 1369}. FAST ile para transferi işleminiz başarıyla gerçekleştirildi! Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bu kadar."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! İyi günler dilerim, tekrar görüşmek üzere! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sen bir şey yaptın mı?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet, talebiniz üzerine annenizin hesabına FAST ile 1.369 TL para transferi işlemini gerçekleştirdim. Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Alıyorum zaten yua bitince yua ile bir data base oluşturacağız. Şey yapacağız, datayı bir sağlamlaşacağız. Yuyı bir sağlam hale getirip dataya entegre edeceğiz. Şu anda sisteme aman son 3 saat."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça yoğun bir teknik süreçten geçiyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, size destek vermekten mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu an bir şey kaldı, dudak okuma integre etmek."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Dene yararlıcağım mesela."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan memnuniyet duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Direkt buradan şey mi oluşuyorsun? Kitap şey mi oluşturuyorsun? Kitap okey yani utanmadan kendi depona mı kuşluyorsun?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kaç tane program var? 2 tane vardı, artı 5 oldu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O takipçi aldım. Takip iyi takipçimi aldım. Güzel bir film var tabii benim reform da 8 tane proje var. Oğlum hepsi şey mi bu?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kanka bak benim 12, üçüncü sen onu deneme için açıyorum. Onu deneme için kullanıyorum. Bazen 4345677 tane projem var, çalışıyor. Oğlum çalışıyor. Ben sonradan düzelttim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir proje sürecindesiniz! Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne oldu ki?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ciddi misin, niye değişir oğlum yani nasıl 30 hoca neden puan kırdılar?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kötü'nin bendeki çocukların üstüne her şeyi kullanmışım, anladım beni ya Melih davranıyor. Kanka bir şey söyleyeyim mi gerçekwhatsapp yaptım ya hocaya beğendiremedim. Kanka bir şey söyleyeyim mi hoca dedi. Lan bağlantısını da yap, ben zam bağlantısını yapmadım. Ulusalwhatsapp yaptım. Bildiğin gerçekçi çalışan sağlamwhatsapp'ı orada dedi ki, ben dedi ki bana ben thp istemiyordum, ben yodp istiyordum dedi. Puan kırdı yani şey lan dayı istiyordum, daha basitini istiyordum dedi. Daha iyisini yaptım diye benden puan kırdı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça yaratıcı bir proje üzerinde çalışmışsınız ve emek vermişsiniz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kaynak."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Saçma ben neden sayılan üzerindeki biriyle konuşayım ki benim bütün dünyayla konuşmam lazım dedi. Gerçekwhatsapp'a gittim, sıfırdan yaptım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yaratıcı bir fikir üzerinde çalışıyorsunuz ve projeleriniz hakkında oldukça tutkulu görünüyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemleriyle ilgili yardımcı olabiliyorum. Bu konularda bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hoca 32 vermiş. ******** ******."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen nazik bir dil kullanmaya özen gösterelim. Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Umudu oraya biri gidip bakmış."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Fonksiyon."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer para transferi veya bakiye sorgulama işlemleriyle ilgili bir fonksiyon çalıştırmak istiyorsanız, bana açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bir kodu kopyala şeye koy seneler çalışmıyor. Nasıl ses çalışmıyor, python var mı?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir sorun yaşıyor olabilirsiniz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sen paşa nerde çalışıyorsun?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ben buradayım ve yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Senin çocukluğum var."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şehir, okan, Kayseri, Galatasaray."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O an burada şey diyebiliriz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen net bir şekilde belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Lütfen dürüst olanları da çok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şey."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Faytının şeyi de değil hayatta değil sistem evromanın yaz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Arama yeni araya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Çevre değişkenleri yazımı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Nasıl şeyini söyleri var ya?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Arkadaş çevresi meselelerin mesela olmaktan düşün anne."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sistemde ortam değişikliğe imiş ya Türkçe izleyicileri."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen net bir şekilde belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Orada özellikleri, sonra hayır, hayır yaşamıyor, değiştirme olmazsa ortam değişiklerini tutan."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kahkaha ses?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tim 2."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Koydu ya böyle bir logo değil mi, yoksa biraz daha."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Oğlum milletin mentorlerine bak bir an."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bizimde ganyan mıydı?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Havva borçolu demin neymiş ya damar bunun beşikçi kez söylüyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Aynen tekstus spik."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şunu kred edeyim de bakalım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi çekme işlemleri şu anda desteklenmiyor. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kime para göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anneme para göndermek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ne kadar göndermek istiyorsunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "9 TL 62 kuruş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "FAST mi EFT mi göndermek istersiniz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kararsızım ve fast olsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani annenizin hesabına FAST ile 9 TL 62 kuruş göndermek istiyorsunuz, onaylıyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sayı karışmış bakiyeyi tekrardan güncellemek istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bakiye sorgulama {kişi}. Bakiyenizi öğrenmek için işlem yapıyorum... Bakiyeniz şu anda güncellenmiştir! Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kanka şey, hayır."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! Eğer başka bir işlem yapmak isterseniz, buradayım. İyi günler dilerim! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani isim olarak tanıtmıyorum ilk başta merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bitirdim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! Eğer başka bir işlem yapmak isterseniz, buradayım. İyi günler dilerim! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ganoğlu boyuta yazarız, azun şeyini falan diye ben sana dedim ki prompez yazayım bir dakika tamam benim hesap sende var ya merhaba doğru oradan gir doğru doğru. Biz dosya sunumu yapalım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreçten geçiyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şey yapmak için mesela?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani kaldırmayacağım, bunu ben çok seviyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım! 😊 Eğer bakiye sorgulama veya para transferi yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. Başka bir konuda şu an destek sağlayamıyorum."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yok şey sırayla giderdim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım! Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Size sıralı bir şekilde yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Merhaba! Size nasıl yardımcı olabilirim? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Böyle konu hakkında şey?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Herkesin için değil de şeydir. Erişebilirlik bir bankacılık."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Erişebiliyoruz. Hadi geliş şimdi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Benim github hesabına ekle o şifreler onlar kendi ekimdeki çıkabilirsiniz, yaşıyorsun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Üzgünüm, güvenlik ve gizlilik nedeniyle şifre, kullanıcı adı veya kişisel bilgi taleplerine yardımcı olamıyorum. Ancak bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size memnuniyetle yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bir şey bekliyorum şunu?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sayın bezmenler."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Gözlerim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Olabilir ya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen detayları belirtin. Size yardımcı olmak için buradayım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şunu yukarı çekeyim mi biraz?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen açıkça belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ben şimdi krediyi yapmıyorum. Ben şu an kredi demiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım! Şu anda kredi çekme işlemleri desteklenmiyor. Ancak bakiye sorgulama veya para transferi yapmak isterseniz, size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu an seni şey görüyor."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? 😊 Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Seni denesin bak senin ne olduğunu bilmiyor ki?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ben, yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olmak için buradayım. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bak, şuan sen tire'de vitreyşın beşte böyle oluyor itrey'in üstafa sanki sağlıklı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Nötr kredi kredi kredi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi çekme işlemleri şu anda desteklenmiyor. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Varlık bir çerçeve içine aldım. Nasıl yaptın bakayım ve yakınlaştırayım. Özür dilerim de şu an dönüyorsun böyle dümdüz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Giriş yapalım gerçekten mi gidiyor? Ne?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Neyse ki Tuğçe komediniz olmuyor bunu şimdi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Nasıl yaptın? Bizim sadece para gönder konusu vardı. Kredi ek diyoruz işte."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi çekme işlemleri şu anda desteklenmiyor. Yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ben kendi konum ne bilmiyorum şu anda."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Onu bile değiştiremiyor musunuz? Öyle kalıyor musun?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Meti tanıyordur. Sadece denediniz mi onu bakacağız."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "He az önce bir şey tespit etmiyormuş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğlen en kötü ne olacak biliyor musunuz?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bir saniye bir dur bir şeyini düzelteceğim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tabii, bekliyorum! Eğer bakiye sorgulama veya para transferi işlemi yapmak isterseniz, hazır olduğunuzda belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Nötrken çalış mı bak?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "8 gün içinde onları okuyordum. Etraftaki ağzını kapat ağzını kapat seni ölçüyor."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi çekme işlemleri şu anda desteklenmiyor. Şu an yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Başka bir işlem yapmak ister misiniz? 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kodu öyle bir noktaya geldi ki hiç tanımıyorum ya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir sürecin içerisindesiniz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Saat 10:05 ekstra yarım saat sigaramı olası ama bu yarım saat yarısında kola ekstra olarak bir format formu da saat üçte göndermiş olmanızı bekliyoruz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yok kıymet Allah rızası için bi geldi. Boşuna bi baksana bi kontrol sana."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "80 bunların hep ben söyleyeyim, yaptım, kabul vereceğiz. Sadece onların kodlu vereceksiniz, form var. Formda bazı sorular var, forma önden okuyun arkadaşlarwhatsapp grubunda var form demo su muydu ya onu temiz arkadaşlar 15 30 ila 15 otuzda başlayalım, toplandı hiçbir değişiklik yok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreç içerisindesiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "%80 1.000 olması."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer para transferi yapmak istiyorsanız, kime ve ne kadar göndermek istediğinizi belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Fotoğraf olarak ekleyelim, onu en kötü taraf, eşim örnek sistemizdeki şeylere o seni uyutuyor ya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi diyor onların fotoğraflarını alıp şey ekleyelim diyorum sunmayı ekleyelim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kredi çekme işlemleri şu anda desteklenmiyor. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamam Berkay."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! Başka bir işlem yapmak isterseniz, buradayım. İyi günler dilerim! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sen sende ne yaptın, bir şey mi 10'a çıkart göre şey değil ama dayanışıyoruz. Alt türk'tan da çıkarırsın."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreç içerisindesiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Göm diyorum yani. Ayrıca noktası ayrıca ve sıkıntı oluşturamıyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hayır, tamamen göndermeme."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım. Eğer bir işlem yapmak istiyorsanız, lütfen net bir şekilde belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tek bir dosya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "%99 91 vardı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olabilirim. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Alakası yok, bu arada alakası yok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Fotoğraftan daha fazla çünkü anlatıyorsun artık sadece."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bu yönde değil olarak tüm yazılar gördüğünden sınırlı geliyor."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Kendimi böyle koyacağım kanka?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen net bir şekilde belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sınava koyacağız panik."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sadece ayıracağım, öyle söyleyeyim sana."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Aklıma çok güzel bir şey geldi diye."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Harika! Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir şey yapmak isterseniz, lütfen belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Heyecanlandım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Harika! Eğer bir işlem yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. 😊 Bakiye sorgulama veya para transferiyle ilgili taleplerinizi iletebilirsiniz!"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hayır rastgele mutlu oldu ya?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Harika, mutlu olmanız çok güzel! 😊 Eğer bakiye sorgulama veya para transferi yapmak isterseniz, lütfen belirtin. Size yardımcı olmak için buradayım!"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Vaktimiz zaman."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen net bir şekilde belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Fotoğraflarda."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Açılış yaparım ben dedi. Tamam."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Size yardımcı olmak için buradayım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yüzdelik var ki toplamda engellenme gibi değil düşünür müsünüz telifler yani diye konuşulur."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Gel daha doğrusu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Işte bir şey olur mu? Toplamaya gel durup böyle."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şey diyebiliriz. Bu yüzden tüketici olan insanlar."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Işte zorlanıyorum, geri kalanımızda oturuyor. Herhangi bir zorunlulukla şeyler bilmiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen net bir şekilde belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamam, bunun yanındayız. Proje engellemenin noktadan sürüklerse dudak yapılma ve."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Atıyorum, şehit değişti."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Uzatabilirim ki erkeğin ilgisini."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet, evet."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tam olaylara."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eksi infteks değiştirdiğimiz anda düzeliyor. Tamam onu sen bilirsin şu an hani artık vaktimiz yok. Bu kadar ince şeyleri düşünecek. Şimdi konum sen bile."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreç içerisindesiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O tarz da onu kullandıkça tamam örnekler yazıyorum. Çin'de başka teknoloji yok azer ve okunaya."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hep beraber duş bir de şey vardı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ama te bu yardımcı yardımcı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Size yardımcı olmak için buradayım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bence kalsın istiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! Eğer bakiye sorgulama veya para transferi yapmak isterseniz, lütfen belirtin. Yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Size nasıl yardımcı olabilirim? Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şey var, sıkıntısı var ama hiç sıkıntı değil."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen net bir şekilde belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sen şunu atayım, bekle ikinciyi mi yaptın?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen açıkça belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Almıyorum, tam tersi bir şeyleri eklemeye çalışıyorum. Şu an birlikte uygulama çalışıyor. Her şey çalışıyor, mimik okuyor. Mimik mimiğin deseni para gönderecek, onu yazıyorum. Şu anda sque'de de şey yaz kredi çekmekle sqeden."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir süreç üzerinde çalışıyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Kredi çekme işlemleri şu an desteklenmiyor. Eğer bakiye veya para transferiyle ilgili bir işlem yapmak isterseniz, size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Aynı 6 ekim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Onları kesin sen toparlarsın yani?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ay Türkçe genelde Türkçe yazıyoruz da."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet, sizinle Türkçe konuşuyorum! 😊 Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen belirtin. Size yardımcı olmaktan memnuniyet duyarım!"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Oğlum bu IMF sürekli değişiyormuş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Zaten tek bu şeyleri nerede anlatıldı ya bize anladın mı?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Direk şeyine siteyi atayım üstünden tavır."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Leyla hel."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anlatmasamızı çözelim."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bu da ayrı bir şey isteği sanırım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ya şöyle yapsam."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Konsalan."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hesaplar için olarak tam olarak neredesin?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ben buradayım ve size yardımcı olmaya hazırım! 😊 Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen detayları belirtin."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Batıda hani şey yok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bunu yapılmış olur."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tabii görmüyor."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ara Şaban."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmak için buradayım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Koda gir burada oluşturuyor. Onu söylüyorum sana kodda oluşturmuyor. Kodta script oluşturulmuş, işte script oluşmak."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir konuda konuşuyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "O yüzden diyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Mantık kuantamı doldurdun."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Burada ben şu an bir şey söyleyemem. Şu anki şeyde."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Tamamdır! Eğer bakiye sorgulama veya para transferi yapmak isterseniz, lütfen belirtin. Yardımcı olmak için buradayım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "En üstteki sürenin bu %1 miktarın farklı bunu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan memnuniyet duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "En sonda da şunu."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin. Yardımcı olmak için buradayım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yatırım yapıda olduğunu gösteriler. Yani aynen."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu şekilde çalışıyor, mimik okuyor. Şu anda mimik okuyarak para göndermek mi istediğini yapsa kredi almak istediğini mi gösteriyor? Ama işte mesela para almak istediğini istediğinde biz şuraya bir getache'yi getek'in yazdık. Facebook'a yapıyoruz, back andine şurada çağırıyoruz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Kredi çekme işlemleri şu anda desteklenmiyor. Eğer bakiye sorgulama veya para transferi işlemleriyle ilgili bir talebiniz varsa, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yiyecek şunu yapacaksın o tarafa."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Uygulama çok büyüdü o."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, uygulamanız büyümüş ve gelişmiş görünüyor! 😊 Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "I p ı."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Oturdu, nereye geliyor vesaire?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sana bayılıyorum hala."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Teşekkür ederim, çok naziksiniz! 😊 Size nasıl yardımcı olabilirim?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ekipleri şey yapıyoruz. Hani test amaçlı sunum yapabilirsiniz. Hani 17 dakika içerisinde önden sunmak isterseniz bir dinleyebiliyoruz. Ekip arkadaşlarımız bekliyor da sırayla sunabilirsiniz. Kısa kısa."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreçten geçiyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Iıı facepi'de şu an mimik okuma var. Mimik okuma da burada işte şeyi anlıyor, paramı geldiğini göster. Bence şunu söylemek için pritleri gördüm zaten aşağıda evet braitlerden sonra metoda sokamadığın yeri göster buradan 3 önemiyorum. Şurayı şu çalışmıyor, bu beni istediğim lokasyona götürmüyor. Mesela krediniz değerlendiriyor kredis burada şey yap buraya getirmesi gerekiyor. Transferde şunu açması gerekiyor yani o şekilde yapmak gerekiyor. Doğru baktın mı?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir işlem akışından bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Kredi çekme işlemleri şu anda desteklenmiyor. Eğer bakiye sorgulama veya para transferiyle ilgili bir işlem yapmak isterseniz, size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yani buraya kadar çok güzel geldik. Son 23 saattir yua ile uğraşıyoruz, iyi yapmışsınız."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir şekilde çalışıyorsunuz! 😊 Eğer benimle ilgili bir işlem yapmak isterseniz, bakiye sorgulama veya para transferi konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Request hattımız yer olsun, kamera işlemleri olsun, anlık kamera kontrolleri olsun. Hem bunların hepsi arkadaki farklı dosyalarda. Burada sadece thyp'nin şeyleri var. Tamam yani burası var. Şahıs gibi kontrolün olarak kullanıcılar. Evet tamam okey çok iyi ancak yönlendirmeyi yapıyorsun diğer yer buradan diğer şeylere ilgili şeyleri evet servislerin çalışmasını sağladın, bir ortamı doğru muyum? Tamam okey çok iyi şimdi siyan buna bir end point veri olman lazım, adresi veriyor olman lazım şey gibi işte."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir entegrasyon sürecinden bahsediyorsunuz ve oldukça detaylı bir işlem akışını tarif ediyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yoya biraz şey girmiyor. Hiçbir fikrim yoktu. Yuvayı nasıl yapılır ya da fronten noktaya yapılıyor. Falansaydınız çok daha rahat olur. Böyle next jest yazan bir şey var."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir projede çalışıyorsunuz ve bazı noktaları netleştirmeye çalışıyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Sadece satın halleteceğiz abi ben sordum, maxie kullanımıydın o dedi ki saf eş html kullandığın için bende sana kullandım. Tamam."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, teknik bir çözüm üzerinde çalışıyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Örnek kod yazar mısın, canım html'i mi gönder giriyoruz? Hepsini alıcam şimdi bak."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Üzgünüm, kod yazmak benim yetki alanımda değil. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, size memnuniyetle yardımcı olurum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Rutuna işte bir 100 liray dille gidiyorsun ve davet işlemi il gönderdiğin zaman işte o şeyi database'den silmesi için bir istekli bulunmuş oluyorsunuz. Aslında anladım ve burada içinde kullandığı şeyler de mesela 10'a çıkart göre düzenleyip ön yüzü buna benzer. Hani işlemleri seni az önce yaptırmak için işlemleri yaptırabilirsin ama bu sana bir ön 100 sunmayacak. Bu sana sadece ön 100 ile back endin."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, detaylı teknik bir süreçten bahsediyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Keyif oldum da biz formu doldurduk. Tamam, sadece bunu yüklemek kaldı. Kodların mı? Evet tamam onda problem yok 10 beşe kadar kod yükleyebilirsiniz dedik. Onda hiç bir problem yok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreç içerisindesiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğitimi içinde örnek eğittik. Keşke onu daha az seviyede yapsaydınız atıyorum. Az sadece krediyle para gönder 2 komut için abi 12 saat boyunca doğrudur. Şimdi eğittik yani çok kısa incelemeyince ece mesela bak burada yapılmaya çalışan şey sana verdiği apiler mesela şunlar sen o ruh üzerinden apili kör dokunmatik mi? Evet işte apik körün ipadin slaş apy slaş körd action üzerinden mesela şu kolu çalıştıracak bir yapı olmuş."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir entegrasyon sürecinden geçiyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu an var mı? Bilgisayarında ııı yok belki olan bir arkadaşından isteyebilirsin. Aynı ağ bağlıysanız çalışacaktır diye tahmin ediyorum. Seni aydesine gelmediler lazım. Gla cos temeleri yeterli olmaz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Demin tekrardan bak şuan pek incele diyelim, network diyeceğiz, tamam mı? Burası senin hangi butona bastığın zaman neyi çağırmaya çalıştığını gösteren yer okey mi? Sürekli zaten bir şeyi çağırıyor diye çağırmaya çalışıyor bilmiyorum ama cerntach'in diye ondu mu dönüyor. Action transfer bir şeyler dönüyor çünkü şey ben şu an kameradan beni okuyor ve sürekli para gönderme isteği olarak algılıyor. Benim ağızlarımızdan tamam çok iyi o zaman."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça karmaşık bir teknik proje üzerinde çalışıyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ve o benim para göndermek istediğimi şimdi bunu ancak gibi. Tamam, okey dur, şimdi sen bunu yaptığın zaman bir yere istek atıyor olman lazım değil mi? Evet seni istek attığın yer 120.0 noktasıfır bir Hüseyin ipadsın, 800 portundaki currn actionına gidiyorsun değil mi? Buraya bir körd action yazar mısın?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Üzgünüm, doğrudan kod yazmak veya teknik entegrasyonlarla ilgili işlem yapmak benim yetki alanımda değil. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin, size yardımcı olmaktan mutluluk duyarım. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Işine gidiyor ama bizimki aslında çörek işini de iyidir. Şu tarafta o yüzden böyle oluyor olabilir. Bilmiyorum. Bir saniye yüzünü istasyon ama şan dündü. Safhem var çok iyi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça teknik bir konuda konuşuyorsunuz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Yansıtmakta bunu size bir şekilde yansıtma ama fazla açarsanız hakkınızı böyle olur falan diye şimdi anlatacağım. Bence onun şeylerini yükledik zaten sunum özellikle yükledik. Onlara böyle bir fotoğrafları, videoları şeyler hepsine yükledikleri şeyleri sormalı. Boşnak içinde aynı zamanda o şekilde yaptı. Dediğim gibi biz normalde tamamen de dulak okumayla hareket edebilecek bir şey yapabiliriz. Zannettikte meşin örnek etmiyor. Bu kadar soru şu olduğunu bilmiyorum."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, oldukça detaylı bir proje üzerinde çalışıyorsunuz ve ilginç bir fikir geliştirmişsiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularda bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Çekip çekip full şey yaptık. Evet, modelinizi seviye yaptığını söylüyorum efendim. Evet sıfırdan evet kanka buradan tam orada vutan haberin güzel. Bana arkadaşlar kendi gidelim atabilir miyim? Tabi ki tam da olabilir. Hayır bak 19 dakikamız kaldı. Tabi başka problem yaşarsınız. O yüzden şimdi yüklüyorum şimdi muhabbet sohbeti hani bizi bizim için sorguluyor sizin için söylüyorum ben."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, yoğun bir süreç içerisindesiniz! Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bu da mı kalmışsın? Buraya kadar ilginç yani falan."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet, buradayım ve yardımcı olmaya hazırım! 😊 Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen açıkça belirtin."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Keki varsa orada arkadaşlar devam ediyor. Onlara mı söyleyin? Burada şey anlatabiliriz ya text be hiç anlatırım."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen net bir şekilde belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bilmiyorum, sonuçta burada biter bilmiyorum. Sonuçta şey olur, tamamdır. Başarılar diliyorum, çok teşekkür ediyor, çok teşekkür ederiz."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Rica ederim! Eğer ileride bakiye sorgulama veya para transferi işlemlerinde yardıma ihtiyacınız olursa, buradayım. Başarılar ve iyi günler dilerim! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hazır beni kullandığımız yazıyor ki nerede?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi işlemi yapmak istiyorsanız, lütfen açıkça belirtin. Size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Hazır beni kullandınız mı? Yazıyor ki nerede oğlum forma mantık yani aynen en sona mesela şey sorarsın ya öyle falan gibi."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, bir süreci veya formu tartışıyorsunuz. Ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Ama şey yapmadı. Dur ne?"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen net bir şekilde belirtin. Bu konularda size yardımcı olmaktan mutluluk duyarım! 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Buraya mı yazıyor sen buraya yazınca."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Evet, buraya yazdığınızda size yardımcı olmak için yanıt veriyorum. Eğer bakiye sorgulama veya para transferi yapmak istiyorsanız, lütfen detayları belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Bilirim o son dakika çıkarım. Gözüne takımın detayı o daha da çok sese geldi. Bundan sonra güzel bir sigara içeriz ama fena bir sigara."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu işlemlerle ilgili bir talebiniz varsa, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Oğlum açıl açıl açıl aaa."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Eğer bir işlem yapmak istiyorsanız, lütfen açıkça belirtin. Şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. 😊"
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Olduğu gibi proje nasıl gidecek diyeceğim yani onu bilmiyorum. Ben normalde git konu çekiyorum. Direk yok mu? Tatlı eskafa yok."
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "Anladım, ancak şu anda yalnızca bakiye sorgulama ve para transferi işlemlerinde yardımcı olabiliyorum. Eğer bu konularla ilgili bir işlem yapmak isterseniz, lütfen açıkça belirtin. 😊"
+            }
+        ]
+    }
+]

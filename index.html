@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alternatif Bank Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: #ffffff;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            width: 100%;
+            max-width: 28rem;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #ad2460;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            color: #111827;
+            background: white;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: #ad2460;
+            box-shadow: 0 0 0 3px rgba(173, 36, 96, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #ad2460;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #8f1e51;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #ad2460;
+            border: 1px solid rgba(173, 36, 96, 0.3);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(173, 36, 96, 0.05);
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .header {
+            border-bottom: 1px solid rgba(173, 36, 96, 0.2);
+            padding: 1.5rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #ad2460;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-subtitle {
+            color: #6b7280;
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: #374151;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .logout-btn:hover {
+            color: #ad2460;
+        }
+
+        .tabs {
+            border-bottom: 1px solid #e5e7eb;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .tabs-list {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .tab-btn {
+            padding: 1rem 0.25rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .tab-btn.active {
+            color: #ad2460;
+            border-color: #ad2460;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .table-container {
+            border: 1px solid rgba(173, 36, 96, 0.2);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 1px solid rgba(173, 36, 96, 0.2);
+        }
+
+        th {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        th.text-right {
+            text-align: right;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td.text-right {
+            text-align: right;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(173, 36, 96, 0.05);
+        }
+
+        .credit-summary {
+            background: rgba(173, 36, 96, 0.05);
+            border: 1px solid rgba(173, 36, 96, 0.2);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .credit-summary h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        .credit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .credit-item label {
+            display: block;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .credit-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .operations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .operation-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .operation-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .operation-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 90%;
+            max-width: 28rem;
+            animation: modalIn 0.2s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #6b7280;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+        }
+
+        .error-text {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+            animation: toastIn 0.3s ease-out;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-1rem);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast-content {
+            min-width: 320px;
+            max-width: 28rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toast-success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .toast-error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .text-green {
+            color: #059669;
+        }
+
+        .text-red {
+            color: #dc2626;
+        }
+
+        .text-gray {
+            color: #9ca3af;
+        }
+
+        .font-mono {
+            font-family: 'Courier New', monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            border: 1px solid rgba(173, 36, 96, 0.2);
+            border-radius: 0.5rem;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        const STORAGE_KEYS = {
+            accounts: 'alternatif_bank_accounts',
+            transfers: 'alternatif_bank_transfers',
+            currentUser: 'alternatif_bank_current_user',
+        };
+
+        const INITIAL_ACCOUNTS = [
+            {
+                id: 1,
+                iban: 'TR120006200000000123456789',
+                full_name: 'Ayşe Yılmaz',
+                balance: 5000.0,
+                credit_debt: 0.0,
+                created_at: '2025-10-24',
+            },
+            {
+                id: 2,
+                iban: 'TR560006200000000987654321',
+                full_name: 'Mehmet Demir',
+                balance: 2500.0,
+                credit_debt: 0.0,
+                created_at: '2025-10-24',
+            },
+            {
+                id: 3,
+                iban: 'TR900006200000000111222333',
+                full_name: 'Ece Kaya',
+                balance: 1000.0,
+                credit_debt: 0.0,
+                created_at: '2025-10-24',
+            },
+        ];
+
+        const state = {
+            accounts: [],
+            transfers: [],
+            currentUser: null,
+            activeTab: 'credit',
+            isModalOpen: false,
+            toast: null,
+        };
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('tr-TR', {
+                style: 'currency',
+                currency: 'TRY',
+            }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('tr-TR');
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('tr-TR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        }
+
+        function initializeData() {
+            const storedAccounts = localStorage.getItem(STORAGE_KEYS.accounts);
+            const storedTransfers = localStorage.getItem(STORAGE_KEYS.transfers);
+            const storedUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+
+            if (storedAccounts) {
+                state.accounts = JSON.parse(storedAccounts);
+            } else {
+                state.accounts = INITIAL_ACCOUNTS;
+                localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(INITIAL_ACCOUNTS));
+            }
+
+            if (storedTransfers) {
+                state.transfers = JSON.parse(storedTransfers);
+            } else {
+                localStorage.setItem(STORAGE_KEYS.transfers, JSON.stringify([]));
+            }
+
+            if (storedUser) {
+                state.currentUser = storedUser;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            state.toast = { message, type };
+            render();
+            setTimeout(() => {
+                state.toast = null;
+                render();
+            }, 3000);
+        }
+
+        function handleLogin(name) {
+            state.currentUser = name;
+            localStorage.setItem(STORAGE_KEYS.currentUser, name);
+            render();
+        }
+
+        function handleLogout() {
+            state.currentUser = null;
+            localStorage.removeItem(STORAGE_KEYS.currentUser);
+            state.activeTab = 'credit';
+            render();
+        }
+
+        async function handleTransfer(fromIban, toIban, amount) {
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                const fromAccount = state.accounts.find(acc => acc.iban === fromIban);
+                const toAccount = state.accounts.find(acc => acc.iban === toIban);
+
+                if (!fromAccount || !toAccount) {
+                    throw new Error('Hesap bulunamadı');
+                }
+
+                if (fromAccount.balance < amount) {
+                    throw new Error('Yetersiz bakiye');
+                }
+
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.iban === fromIban) {
+                        return { ...acc, balance: acc.balance - amount };
+                    }
+                    if (acc.iban === toIban) {
+                        return { ...acc, balance: acc.balance + amount };
+                    }
+                    return acc;
+                });
+
+                const newTransfer = {
+                    id: state.transfers.length + 1,
+                    amount,
+                    from_account_id: fromAccount.id,
+                    to_account_id: toAccount.id,
+                    from_iban: fromAccount.iban,
+                    from_full_name: fromAccount.full_name,
+                    to_iban: toAccount.iban,
+                    to_full_name: toAccount.full_name,
+                    created_at: new Date().toISOString(),
+                };
+
+                state.transfers.push(newTransfer);
+
+                localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(state.accounts));
+                localStorage.setItem(STORAGE_KEYS.transfers, JSON.stringify(state.transfers));
+
+                state.isModalOpen = false;
+                showToast('Transfer işlemi başarıyla tamamlandı', 'success');
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function handleCreditWithdraw(amount) {
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.full_name === state.currentUser) {
+                        return {
+                            ...acc,
+                            balance: acc.balance + amount,
+                            credit_debt: acc.credit_debt + amount,
+                        };
+                    }
+                    return acc;
+                });
+
+                localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(state.accounts));
+                showToast(`${amount.toFixed(2)} TRY kredi başarıyla çekildi`, 'success');
+            } catch (error) {
+                showToast('Kredi çekme işlemi başarısız', 'error');
+            }
+        }
+
+        async function handleCreditPayment(amount) {
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.full_name === state.currentUser) {
+                        return {
+                            ...acc,
+                            balance: acc.balance - amount,
+                            credit_debt: acc.credit_debt - amount,
+                        };
+                    }
+                    return acc;
+                });
+
+                localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(state.accounts));
+                showToast(`${amount.toFixed(2)} TRY kredi borcu başarıyla ödendi`, 'success');
+            } catch (error) {
+                showToast('Kredi ödeme işlemi başarısız', 'error');
+            }
+        }
+
+        function renderLoginScreen() {
+            return `
+                <div class="login-screen">
+                    <div class="login-card">
+                        <h1 class="login-title">Alternatif Bank Demo</h1>
+                        <p class="login-subtitle">Giriş yapmak için adınızı seçin</p>
+                        <form onsubmit="event.preventDefault(); handleLogin(document.getElementById('loginName').value);">
+                            <div class="form-group">
+                                <label for="loginName">İsim Seçiniz</label>
+                                <select id="loginName" required>
+                                    <option value="">Bir isim seçin...</option>
+                                    ${INITIAL_ACCOUNTS.map(acc => `<option value="${acc.full_name}">${acc.full_name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4m-5-4l5-5-5-5m5 5H3"/></svg>
+                                Giriş Yap
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCreditOperations(currentAccount) {
+            return `
+                <div>
+                    <div class="credit-summary">
+                        <h3>Kredi Bilgileriniz</h3>
+                        <div class="credit-grid">
+                            <div class="credit-item">
+                                <label>Mevcut Bakiye</label>
+                                <div class="credit-value text-green">${formatCurrency(currentAccount.balance)}</div>
+                            </div>
+                            <div class="credit-item">
+                                <label>Kredi Borcu</label>
+                                <div class="credit-value ${currentAccount.credit_debt > 0 ? 'text-red' : 'text-gray'}">
+                                    ${formatCurrency(currentAccount.credit_debt)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="operations-grid">
+                        <div class="operation-card">
+                            <div class="operation-header">
+                                <svg class="icon" style="color: #ad2460;" viewBox="0 0 24 24">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                    <line x1="1" y1="10" x2="23" y2="10"/>
+                                </svg>
+                                <h3 class="operation-title">Kredi Çek</h3>
+                            </div>
+                            <form onsubmit="event.preventDefault(); const amt = parseFloat(document.getElementById('withdrawAmount').value); if (amt > 0) { handleCreditWithdraw(amt); document.getElementById('withdrawAmount').value = ''; }">
+                                <div class="form-group">
+                                    <label for="withdrawAmount">Çekilecek Tutar (TRY)</label>
+                                    <input type="number" id="withdrawAmount" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <svg class="icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                    Kredi Çek
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="operation-card">
+                            <div class="operation-header">
+                                <svg class="icon" style="color: #059669;" viewBox="0 0 24 24">
+                                    <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
+                                </svg>
+                                <h3 class="operation-title">Kredi Öde</h3>
+                            </div>
+                            <form onsubmit="event.preventDefault(); const amt = parseFloat(document.getElementById('paymentAmount').value); const currentAcc = state.accounts.find(a => a.full_name === state.currentUser); if (amt > 0 && amt <= currentAcc.balance && amt <= currentAcc.credit_debt) { handleCreditPayment(amt); document.getElementById('paymentAmount').value = ''; } else if (amt > currentAcc.balance) { showToast('Yetersiz bakiye', 'error'); } else if (amt > currentAcc.credit_debt) { showToast('Ödeme tutarı kredi borcundan fazla olamaz', 'error'); }">
+                                <div class="form-group">
+                                    <label for="paymentAmount">Ödenecek Tutar (TRY)</label>
+                                    <input type="number" id="paymentAmount" step="0.01" min="0" placeholder="0.00" required ${currentAccount.credit_debt === 0 ? 'disabled' : ''}>
+                                </div>
+                                <button type="submit" class="btn btn-success" ${currentAccount.credit_debt === 0 ? 'disabled' : ''}>
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                                    Kredi Öde
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAccountList() {
+            return `
+                <div>
+                    <div class="section-header">
+                        <h2 class="section-title">Hesaplar</h2>
+                        <button class="btn btn-primary" onclick="state.isModalOpen = true; render();" style="width: auto;">
+                            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Yeni Transfer
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>IBAN</th>
+                                    <th>İsim</th>
+                                    <th class="text-right">Bakiye</th>
+                                    <th class="text-right">Kredi Borcu</th>
+                                    <th>Oluşturulma Tarihi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${state.accounts.map(acc => `
+                                    <tr>
+                                        <td class="font-mono">${acc.iban}</td>
+                                        <td>${acc.full_name}</td>
+                                        <td class="text-right text-green" style="font-weight: 600;">${formatCurrency(acc.balance)}</td>
+                                        <td class="text-right ${acc.credit_debt > 0 ? 'text-red' : 'text-gray'}" style="font-weight: 600;">${formatCurrency(acc.credit_debt)}</td>
+                                        <td style="color: #6b7280;">${formatDate(acc.created_at)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTransferHistory() {
+            const sortedTransfers = [...state.transfers].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            return `
+                <div>
+                    <h2 class="section-title">Transfer Geçmişi</h2>
+                    ${sortedTransfers.length === 0 ? `
+                        <div class="empty-state">
+                            <p>Henüz transfer işlemi bulunmamaktadır.</p>
+                        </div>
+                    ` : `
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Gönderen</th>
+                                        <th style="text-align: center;"></th>
+                                        <th>Alıcı</th>
+                                        <th class="text-right">Tutar</th>
+                                        <th>Tarih</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sortedTransfers.map(tr => `
+                                        <tr>
+                                            <td style="color: #6b7280;">#${tr.id}</td>
+                                            <td>
+                                                <div style="font-weight: 500;">${tr.from_full_name}</div>
+                                                <div class="font-mono" style="font-size: 0.75rem; color: #6b7280;">${tr.from_iban}</div>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <svg class="icon" style="color: #ad2460; margin: 0 auto;" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                            </td>
+                                            <td>
+                                                <div style="font-weight: 500;">${tr.to_full_name}</div>
+                                                <div class="font-mono" style="font-size: 0.75rem; color: #6b7280;">${tr.to_iban}</div>
+                                            </td>
+                                            <td class="text-right text-green" style="font-weight: 600;">${formatCurrency(tr.amount)}</td>
+                                            <td style="color: #6b7280;">${formatDateTime(tr.created_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderTransferModal() {
+            if (!state.isModalOpen) return '';
+
+            return `
+                <div class="modal-overlay" onclick="if (event.target === this) { state.isModalOpen = false; render(); }">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Yeni Transfer</h2>
+                            <button class="close-btn" onclick="state.isModalOpen = false; render();">
+                                <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="transferForm" onsubmit="event.preventDefault(); const formData = new FormData(event.target); const fromIban = formData.get('fromIban'); const toIban = formData.get('toIban'); const amount = parseFloat(formData.get('amount')); if (fromIban && toIban && amount > 0 && fromIban !== toIban) { handleTransfer(fromIban, toIban, amount); } else if (fromIban === toIban) { showToast('Gönderen ve alıcı IBAN farklı olmalıdır', 'error'); } else { showToast('Lütfen tüm alanları doldurun', 'error'); }">
+                                <div class="form-group">
+                                    <label for="fromIban">Gönderen IBAN</label>
+                                    <select id="fromIban" name="fromIban" required>
+                                        <option value="">IBAN Seçiniz</option>
+                                        ${state.accounts.map(acc => `
+                                            <option value="${acc.iban}">${acc.iban} - ${acc.full_name} (${formatCurrency(acc.balance)})</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="toIban">Alıcı IBAN</label>
+                                    <select id="toIban" name="toIban" required>
+                                        <option value="">IBAN Seçiniz</option>
+                                        ${state.accounts.map(acc => `
+                                            <option value="${acc.iban}">${acc.iban} - ${acc.full_name}</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="amount">Tutar (TRY)</label>
+                                    <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="state.isModalOpen = false; render();">İptal</button>
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;">Transfer Yap</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderToast() {
+            if (!state.toast) return '';
+
+            return `
+                <div class="toast">
+                    <div class="toast-content toast-${state.toast.type}">
+                        <p style="font-size: 0.875rem; font-weight: 500;">${state.toast.message}</p>
+                        <button class="close-btn" onclick="state.toast = null; render();">
+                            <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMainApp() {
+            const currentAccount = state.accounts.find(acc => acc.full_name === state.currentUser);
+
+            if (!currentAccount) {
+                return '<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="color: #dc2626;">Hesap bulunamadı</div></div>';
+            }
+
+            return `
+                <div>
+                    <div class="header">
+                        <div class="container">
+                            <div class="header-content">
+                                <div>
+                                    <h1 class="header-title">Alternatif Bank Demo</h1>
+                                    <p class="header-subtitle">Hoş geldiniz, ${state.currentUser}</p>
+                                </div>
+                                <button class="logout-btn" onclick="handleLogout();">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5-5-5m5 5H9"/></svg>
+                                    Çıkış Yap
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+                        <div class="tabs">
+                            <ul class="tabs-list">
+                                <li>
+                                    <button class="tab-btn ${state.activeTab === 'credit' ? 'active' : ''}" onclick="state.activeTab = 'credit'; render();">
+                                        Kredi İşlemleri
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="tab-btn ${state.activeTab === 'accounts' ? 'active' : ''}" onclick="state.activeTab = 'accounts'; render();">
+                                        Hesaplar
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="tab-btn ${state.activeTab === 'history' ? 'active' : ''}" onclick="state.activeTab = 'history'; render();">
+                                        Transfer Geçmişi
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        ${state.activeTab === 'credit' ? renderCreditOperations(currentAccount) : ''}
+                        ${state.activeTab === 'accounts' ? renderAccountList() : ''}
+                        ${state.activeTab === 'history' ? renderTransferHistory() : ''}
+                    </div>
+
+                    ${renderTransferModal()}
+                    ${renderToast()}
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            if (!state.currentUser) {
+                app.innerHTML = renderLoginScreen();
+            } else {
+                app.innerHTML = renderMainApp();
+            }
+        }
+
+        initializeData();
+        render();
+        async function checkAction() {
+            try {
+                const response = await fetch('/current_action');
+                const data = await response.json();
+
+                if (data.action === "transfer") {
+                    // Transfer modalını aç
+                    state.isModalOpen = true;
+                    render();
+                }
+                else if (data.action === "credit") {
+                    // Kredi tabını aktif yap
+                    state.activeTab = 'credit';
+                    render();
+                }
+            } catch (error) {
+                console.error('Action check error:', error);
+            }
+        }
+
+        setInterval(checkAction, 1000);
+    </script>
+</body>
+
+</html>
